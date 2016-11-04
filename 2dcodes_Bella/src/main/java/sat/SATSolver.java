@@ -14,52 +14,52 @@ import sat.formula.PosLiteral;
 public class SATSolver {
 
     public static Environment solve(Formula formula) {
-        ImList<Clause> clauses = formula.getClauses();              //get the clauses in formula
-        return solve (clauses, new Environment());                  //pass the clauses to overloaded solve
+        ImList<Clause> clauses = formula.getClauses();
+        return solve (clauses, new Environment());
     }
 
     private static Environment solve(ImList<Clause> clauses, Environment env) {
-        if (clauses.isEmpty()) {                                    //if there is no clause, problem is SATISFIABLE
-            return env;                                             //return variable bindings
+        if (clauses.isEmpty()) {
+            return env;
 
-        } else {                                                    //if there is clause
-            Clause sc = null;                                       //sc = smallest clause var
+        } else {
+            Clause sc = null;
             for (Clause c : clauses) {
-                if (c.isEmpty()) {                                  //if the clause is empty
-                    return null;                                    //return null, UNSATISFIABLE
+                if (c.isEmpty()) {                                  
+                    return null;
                 }
-                                                                    //FIND SMALLEST CLAUSE
-                if ((sc == null) || (c.size() < sc.size())) {       //if c is smaller than current sc
-                    sc = c;                                         //reassign sc
+
+                if ((sc == null) || (c.size() < sc.size())) {
+                    sc = c;
                 }
             }
 
-            Literal l = sc.chooseLiteral();                         //choose first literal of sc
-            Variable var = l.getVariable();                         //get the variable of the literal (literal might be pos/neg)
+            Literal l = sc.chooseLiteral();
+            Variable var = l.getVariable();
 
-            if (sc.isUnit()) {                                      //if the smallest clause comprises of one literal
+            if (sc.isUnit()) {
 
-                //set unit clause to TRUE
-                if (l.equals(PosLiteral.make(l.getVariable()))) {   //if the single literal is positive literal
-                    env = env.putTrue(var);                         //set the variable to TRUE
-                } else {                                            //if the single literal is negative literal
-                    env = env.putFalse(var);                        //set the variable to FALSE
+
+                if (l.equals(PosLiteral.make(l.getVariable()))) {
+                    env = env.putTrue(var);
+                } else {
+                    env = env.putFalse(var);
                 }
-                return solve(substitute(clauses, l), env);          //update the clauses and recurse
+                return solve(substitute(clauses, l), env);
             }
 
-            else {                                                  //if the sc is not a unit clause
-                if (l.equals(NegLiteral.make(l.getVariable()))) {   //if literal is a negative literal
-                    l = l.getNegation();                            //reassign l to become a positive literal
+            else {
+                if (l.equals(NegLiteral.make(l.getVariable()))) {
+                    l = l.getNegation();
                 }
 
-                //Try to set literal to TRUE, update the clauses, and recurse
+
                 Environment posTrial = solve(substitute(clauses, l), env.put(var, Bool.TRUE));
                 if (posTrial != null) {
                     return posTrial;
                 }
 
-                //Try to set literal to FALSE, update the clauses, and recurse
+
                 else {
                     l = l.getNegation();
                     return solve(substitute(clauses, l), env.put(var, Bool.FALSE));
@@ -68,7 +68,7 @@ public class SATSolver {
         }
     }
 
-    //TO UPDATE THE CLAUSES EACH TIME WE TRY ASSIGNING A LITERAL TO TRUE/FALSE
+
     private static ImList<Clause> substitute(ImList<Clause> clauses,
             Literal l) {
         ImList<Clause> reducedClauses = new EmptyImList<Clause>();
