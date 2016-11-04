@@ -1,28 +1,17 @@
 package sat;
 
-/*
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-*/
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
+
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import immutable.ImList;
-import javafx.geometry.Pos;
 import sat.env.*;
 import sat.formula.*;
 
@@ -114,67 +103,38 @@ public class SATSolverTest {
                 String[] problem = line.trim().split("\\s+");
                 noOfVar = Integer.parseInt(problem[2]);
                 noOfClauses = Integer.parseInt(problem[3]);
-                //System.out.println("Problem: " + problem[0]);
-                //System.out.println("Problem Type: " + problem[1]);
-                //System.out.println("Problem Variables: " + problem[2]);
-                //System.out.println("Problem Clauses: " + problem[3]);
 
             } else {
                 String[] clause = line.trim().split(" ");
                 for (String lit : clause) {
                     if (!lit.equals("0")) {
-                        //System.out.println("Valid Literal");
                         makeToClause.add(lit);
                     }
                     else{
-                        //System.out.println("Zero");
                         String[] a = makeToClause.toArray(new String[makeToClause.size()]);
                         Literal[] b = new Literal[a.length];
                         for (int i=0; i<a.length; i++){
                             if (a[i].startsWith("-")){
-                                //System.out.println("Neg: " + a[i]);
                                 Literal newNegLit = PosLiteral.make(a[i].substring(1)).getNegation();
                                 b[i]=newNegLit;
                             }
                             else{
-                                //System.out.println("Pos: " + a[i]);
                                 Literal newPosLit = PosLiteral.make(a[i]);
                                 b[i]=newPosLit;
                             }
                         }
                         Clause c = makeCl(b);
-                        //System.out.println(c.toString());
                         makeToFormula.add(c);
                         makeToClause.clear();
                     }
                 }
-                //System.out.println(line);
+
             }
             f = makeFm(makeToFormula.toArray(new Clause[makeToFormula.size()]));
         }
         return f;
     }
 
-    public void testSATSolver1(){
-    	// (a v b)
-    	Environment e = SATSolver.solve(makeFm(makeCl(a,b))	);
-/*
-    	assertTrue( "one of the literals should be set to true",
-    			Bool.TRUE == e.get(a.getVariable())  
-    			|| Bool.TRUE == e.get(b.getVariable())	);
-    	
-*/    	
-    }
-    
-    
-    public void testSATSolver2(){
-    	// (~a)
-    	Environment e = SATSolver.solve(makeFm(makeCl(na)));
-/*
-    	assertEquals( Bool.FALSE, e.get(na.getVariable()));
-*/    	
-    }
-    
     private static Formula makeFm(Clause... e) {
         Formula f = new Formula();
         for (Clause c : e) {
